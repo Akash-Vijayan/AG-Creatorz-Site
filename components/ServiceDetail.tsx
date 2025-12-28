@@ -39,21 +39,6 @@ const ServiceDetail: React.FC<ServiceDetailProps> = ({ service, onBack, onContac
   return (
     <div ref={containerRef} className="bg-white dark:bg-black min-h-screen relative z-40 overflow-hidden transition-colors duration-1000">
       
-      {/* Navigation */}
-      <div className="fixed top-12 left-0 w-full z-50 px-6 pointer-events-none">
-        <div className="max-w-[90rem] mx-auto">
-          <motion.button
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            onClick={onBack}
-            className="pointer-events-auto flex items-center gap-2 bg-white/70 dark:bg-black/50 backdrop-blur-xl px-5 py-3 rounded-full shadow-lg border border-black/5 dark:border-white/10 text-black dark:text-white font-bold hover:bg-brandPrimary hover:text-white hover:border-brandPrimary transition-all group"
-          >
-            <ArrowLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
-            <span className="text-sm font-display uppercase tracking-widest">Back</span>
-          </motion.button>
-        </div>
-      </div>
-
       {/* Hero Section */}
       <section className="relative min-h-[80vh] flex items-center pt-24 overflow-hidden">
         <motion.div 

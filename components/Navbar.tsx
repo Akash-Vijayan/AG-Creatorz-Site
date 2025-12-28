@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Instagram, Moon, Sun, ChevronDown, Linkedin } from 'lucide-react';
+import { Menu, X, Instagram, Moon, Sun, ChevronDown, Linkedin, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SERVICES, LOGO_PATH } from '../constants';
 
@@ -10,6 +10,8 @@ interface NavbarProps {
   currentPage: string;
   onNavigate: (page: string, sectionId?: string) => void;
   onSelectService: (id: string) => void;
+  showBack?: boolean;
+  onBack?: () => void;
 }
 
 const XLogo = () => (
@@ -18,7 +20,15 @@ const XLogo = () => (
   </svg>
 );
 
-const Navbar: React.FC<NavbarProps> = ({ isDarkMode, toggleTheme, currentPage, onNavigate, onSelectService }) => {
+const Navbar: React.FC<NavbarProps> = ({ 
+  isDarkMode, 
+  toggleTheme, 
+  currentPage, 
+  onNavigate, 
+  onSelectService,
+  showBack = false,
+  onBack
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [servicesDropdown, setServicesDropdown] = useState(false);
@@ -71,15 +81,32 @@ const Navbar: React.FC<NavbarProps> = ({ isDarkMode, toggleTheme, currentPage, o
         <div className="max-w-[95rem] mx-auto px-6 md:px-12 w-full">
           <div className="flex justify-between items-center">
             
-            {/* Logo */}
-            <div 
-              className="flex items-center gap-4 cursor-pointer group" 
-              onClick={(e) => handleLinkClick(e, 'home', 'hero')}
-            >
-              <img src={LOGO_PATH} alt="AG" className="h-10 w-auto dark:invert group-hover:scale-110 transition-transform duration-500" />
-              <span className="font-display font-black text-xl tracking-tighter text-black dark:text-white uppercase leading-none">
-                AG CREATORZ<span className="text-brandPrimary">.</span>
-              </span>
+            {/* Left Group: Back Button + Logo */}
+            <div className="flex items-center gap-6">
+              <AnimatePresence>
+                {showBack && (
+                  <motion.button
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -10 }}
+                    onClick={onBack}
+                    className="flex items-center gap-2 text-black/40 dark:text-white/40 hover:text-brandPrimary transition-colors group/back"
+                  >
+                    <ArrowLeft size={16} className="group-hover/back:-translate-x-1 transition-transform" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">Back</span>
+                  </motion.button>
+                )}
+              </AnimatePresence>
+
+              <div 
+                className="flex items-center gap-4 cursor-pointer group" 
+                onClick={(e) => handleLinkClick(e, 'home', 'hero')}
+              >
+                <img src={LOGO_PATH} alt="AG" className="h-10 w-auto dark:invert group-hover:scale-110 transition-transform duration-500" />
+                <span className="font-display font-black text-xl tracking-tighter text-black dark:text-white uppercase leading-none">
+                  AG CREATORZ<span className="text-brandPrimary">.</span>
+                </span>
+              </div>
             </div>
             
             {/* Nav Links */}

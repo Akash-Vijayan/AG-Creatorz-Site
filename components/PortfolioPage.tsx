@@ -28,15 +28,6 @@ const PortfolioPage: React.FC<PortfolioPageProps> = ({ onBack }) => {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row justify-between items-end gap-10 mb-20">
           <div className="space-y-6">
-            <motion.button
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              onClick={onBack}
-              className="flex items-center gap-3 text-brandPrimary font-black uppercase tracking-[0.4em] text-[10px] mb-8 hover:gap-5 transition-all group"
-            >
-              <ArrowLeft size={16} />
-              <span>Back to Home</span>
-            </motion.button>
             <h1 className="text-6xl md:text-8xl lg:text-9xl font-display font-bold uppercase tracking-tighter leading-[0.85]">
               Project <span className="text-brandPrimary italic font-serif lowercase font-normal">archive</span>
             </h1>

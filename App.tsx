@@ -99,6 +99,8 @@ const App: React.FC = () => {
         currentPage={currentView} 
         onNavigate={handleNavigate}
         onSelectService={handleSelectService}
+        showBack={currentView !== 'home'}
+        onBack={() => handleNavigate('home')}
       />
       
       <AiCompanion currentTheme={theme} onSetTheme={setTheme} />

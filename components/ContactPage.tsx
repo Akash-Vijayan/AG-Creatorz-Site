@@ -27,17 +27,6 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
 
       <div className="max-w-[95rem] mx-auto px-6 relative z-10">
         
-        {/* Navigation */}
-        <motion.button
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          onClick={onBack}
-          className="flex items-center gap-3 text-brandPrimary font-black uppercase tracking-[0.4em] text-[10px] mb-16 hover:gap-5 transition-all group"
-        >
-          <ArrowLeft size={16} />
-          <span>Back to Home</span>
-        </motion.button>
-
         <div className="grid lg:grid-cols-2 gap-20 lg:gap-32">
           
           {/* Left Column: Info */}

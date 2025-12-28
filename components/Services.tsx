@@ -1,109 +1,145 @@
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { SERVICES } from '../constants';
-import { Globe, Box, PlayCircle, ArrowRight } from 'lucide-react';
+import React, { useRef } from 'react';
+import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
+import { Globe, Box, PlayCircle, ArrowRight, Sparkles } from 'lucide-react';
 
 interface ServicesProps {
   onSelectService: (serviceId: string) => void;
 }
 
+const SERVICES_DATA = [
+  {
+    id: 'web',
+    title: 'Web Engineering',
+    description: 'Modern, high-performance websites built for scalability and professional presence.',
+    icon: <Globe size={28} />,
+  },
+  {
+    id: 'design',
+    title: 'Graphic Design',
+    description: 'Impactful visual identities created to communicate your brand clearly.',
+    icon: <Box size={28} />,
+  },
+  {
+    id: 'video',
+    title: 'Video Editing',
+    description: 'Engaging edits focused on retention, flow, and high-quality storytelling.',
+    icon: <PlayCircle size={28} />,
+  }
+];
+
 const Services: React.FC<ServicesProps> = ({ onSelectService }) => {
   return (
     <section 
       id="services" 
-      className="relative min-h-screen flex items-center py-24 md:py-32 bg-[#0A0514] overflow-hidden"
+      className="relative w-full py-6 md:py-10 bg-transparent overflow-visible"
     >
-      {/* Background Subtle Tech Grid - Violet Theme */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.05]">
-        <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(circle, #7C3AED 1px, transparent 1px)', backgroundSize: '50px 50px' }} />
-      </div>
-
-      <div className="max-w-[95rem] mx-auto px-6 md:px-12 w-full relative z-10">
-        {/* Header - Neat & Clean */}
-        <div className="flex flex-col items-center text-center mb-16 md:mb-24 space-y-4">
-           <div className="flex items-center gap-3">
-             <div className="w-10 h-[1px] bg-brandPrimary-light/30" />
-             <span className="text-brandPrimary-light text-[10px] font-black uppercase tracking-[0.6em]">Registry // 01</span>
-             <div className="w-10 h-[1px] bg-brandPrimary-light/30" />
-           </div>
-           <h2 className="text-5xl md:text-7xl font-display font-bold text-white uppercase tracking-tighter">
-             Core <span className="italic font-serif font-normal text-brandPrimary-light lowercase">Expertise</span>
-           </h2>
-           <p className="text-white/30 text-[10px] font-mono uppercase tracking-[0.3em] max-w-sm">
-             Architectural precision across primary creative domains.
-           </p>
+      <div className="max-w-[85rem] mx-auto px-6 md:px-12 w-full relative z-10">
+        
+        {/* Header Section - More Compact */}
+        <div className="flex flex-col items-center text-center mb-10 space-y-3">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10"
+          >
+            <Sparkles size={10} className="text-brandPrimary-light" />
+            <span className="text-brandPrimary-light text-[8px] font-black uppercase tracking-[0.4em]">Expert Registry</span>
+          </motion.div>
+          
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white uppercase tracking-tighter leading-none">
+            DIGITAL <span className="italic font-serif font-normal text-brandPrimary-light lowercase">services</span>
+          </h2>
+          
+          <p className="text-white/40 text-[11px] md:text-xs font-light max-w-lg leading-relaxed px-4">
+            Professional digital solutions designed to strengthen online presence through clarity and reliable execution.
+          </p>
         </div>
 
-        {/* The Grid: Perfectly Aligned */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10">
-          {SERVICES.map((service, i) => (
-            <motion.div
-              key={service.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ duration: 0.8, delay: i * 0.15 }}
-              onClick={() => onSelectService(service.id)}
-              className="group relative cursor-pointer"
-            >
-              {/* Card Container: Deep dark glassmorphism */}
-              <div className="relative h-full p-10 md:p-12 rounded-[3.5rem] bg-[#0F0A1F] border border-white/5 overflow-hidden transition-all duration-700 group-hover:border-brandPrimary/40 shadow-2xl backdrop-blur-md flex flex-col justify-between min-h-[500px]">
-                
-                {/* Glow Background on Hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-brandPrimary/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-                
-                {/* Top Section */}
-                <div className="relative z-10">
-                  <div className="flex justify-between items-start mb-10">
-                    <div className="w-16 h-16 rounded-[1.5rem] bg-white/[0.03] border border-white/10 flex items-center justify-center text-brandPrimary-light group-hover:bg-brandPrimary group-hover:text-white transition-all duration-500 shadow-xl">
-                      {service.icon === 'web' ? <Globe size={28} /> : null}
-                      {service.icon === 'design' ? <Box size={28} /> : null}
-                      {service.icon === 'video' ? <PlayCircle size={28} /> : null}
-                    </div>
-                    <span className="text-[10px] font-mono text-white/10 uppercase tracking-[0.4em] font-black group-hover:text-brandPrimary-light transition-colors">
-                      MOD_{i + 1}
-                    </span>
-                  </div>
-
-                  <div className="space-y-6">
-                    <h3 className="text-4xl md:text-5xl font-display font-bold uppercase tracking-tight text-white leading-[0.9] flex flex-col">
-                      {service.title.split(' ').map((word, idx) => (
-                        <span key={idx}>{word}</span>
-                      ))}
-                    </h3>
-                    <p className="text-base text-white/40 leading-relaxed font-light max-w-[260px]">
-                      {service.description}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Bottom Section */}
-                <div className="relative z-10 pt-10 mt-10 border-t border-white/5 space-y-8">
-                  <div className="flex flex-wrap gap-2">
-                    {service.details?.features.slice(0, 2).map((feat: string, idx: number) => (
-                      <span key={idx} className="px-4 py-2 rounded-xl bg-white/[0.03] text-[9px] font-mono font-bold uppercase tracking-widest text-white/50 border border-white/5">
-                        {feat}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="flex justify-between items-center group/btn">
-                    <div className="flex flex-col">
-                      <span className="text-[8px] font-mono text-white/20 uppercase tracking-widest">Investment</span>
-                      <span className="text-2xl font-mono font-bold text-brandPrimary-light">{service.price}</span>
-                    </div>
-                    <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center group-hover/btn:bg-brandPrimary group-hover/btn:text-white transition-all duration-500">
-                      <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+        {/* 3D Service Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 perspective-2000">
+          {SERVICES_DATA.map((service, i) => (
+            <ServiceCard 
+              key={service.id} 
+              service={service} 
+              index={i} 
+              onClick={() => onSelectService(service.id)} 
+            />
           ))}
+        </div>
+
+        {/* Section Action */}
+        <div className="mt-10 flex justify-center">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="group relative px-8 py-3.5 bg-white text-black rounded-full font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl transition-all"
+          >
+            <span className="relative z-10 flex items-center gap-2">
+              Explore All Services <ArrowRight size={14} />
+            </span>
+          </motion.button>
         </div>
       </div>
     </section>
+  );
+};
+
+const ServiceCard: React.FC<{ 
+  service: any; 
+  index: number; 
+  onClick: () => void;
+}> = ({ service, index, onClick }) => {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, -10]), { stiffness: 100, damping: 20 });
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-10, 10]), { stiffness: 100, damping: 20 });
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    mouseX.set((event.clientX - rect.left) / rect.width - 0.5);
+    mouseY.set((event.clientY - rect.top) / rect.height - 0.5);
+  };
+
+  return (
+    <motion.div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={() => { mouseX.set(0); mouseY.set(0); }}
+      onClick={onClick}
+      style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
+      className="group relative cursor-pointer transform-gpu"
+    >
+      <div 
+        className="relative bg-[#120B26]/60 border border-white/5 rounded-[2rem] p-8 h-full flex flex-col justify-between shadow-2xl transition-all duration-700 group-hover:border-brandPrimary/40 backdrop-blur-xl min-h-[340px]"
+        style={{ transformStyle: 'preserve-3d' }}
+      >
+        <div className="relative z-10" style={{ transform: 'translateZ(30px)' }}>
+          <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-brandPrimary-light group-hover:bg-brandPrimary group-hover:text-white transition-all duration-500 mb-6">
+            {service.icon}
+          </div>
+
+          <h3 className="text-xl md:text-2xl font-display font-bold text-white uppercase tracking-tight leading-none mb-3 group-hover:translate-x-1 transition-transform">
+            {service.title}
+          </h3>
+          
+          <p className="text-white/40 text-[11px] leading-relaxed font-light group-hover:text-white/60 transition-colors">
+            {service.description}
+          </p>
+        </div>
+
+        <div className="relative z-10 pt-6 mt-6 border-t border-white/5 flex justify-between items-center" style={{ transform: 'translateZ(50px)' }}>
+          <span className="text-[9px] font-mono font-bold text-brandPrimary-light uppercase tracking-widest">Protocol.0{index+1}</span>
+          <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-brandPrimary group-hover:text-white transition-all">
+            <ArrowRight size={14} />
+          </div>
+        </div>
+      </div>
+    </motion.div>
   );
 };
 

@@ -42,17 +42,6 @@ const AboutPage: React.FC<AboutPageProps> = ({ onBack }) => {
 
       <div className="max-w-[85rem] mx-auto px-6 md:px-12 relative z-10">
         
-        {/* Navigation */}
-        <motion.button
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          onClick={onBack}
-          className="flex items-center gap-3 text-brandPrimary font-black uppercase tracking-[0.4em] text-[10px] mb-24 hover:gap-5 transition-all group"
-        >
-          <ArrowLeft size={16} />
-          <span>Return Home</span>
-        </motion.button>
-
         {/* 1. Digital Foundation */}
         <section className="mb-40 grid lg:grid-cols-12 gap-12 items-start">
           <div className="lg:col-span-5 space-y-8">

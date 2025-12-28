@@ -18,69 +18,96 @@ const TearSection: React.FC<TearSectionProps> = ({ onSelectService, onContact })
   });
 
   const smoothProgress = useSpring(scrollYProgress, {
-    stiffness: 35,
-    damping: 25,
+    stiffness: 30,
+    damping: 20,
     restDelta: 0.001
   });
 
-  // Tear Movement Logic - Pushes halves completely off screen
-  const leftX = useTransform(smoothProgress, [0, 0.5], ["0%", "-100%"]);
-  const rightX = useTransform(smoothProgress, [0, 0.5], ["0%", "100%"]);
-  const leftRotate = useTransform(smoothProgress, [0, 0.5], [0, -10]);
-  const rightRotate = useTransform(smoothProgress, [0, 0.5], [0, 10]);
+  // Aggressive 3D Tear Movement
+  const leftX = useTransform(smoothProgress, [0, 0.45], ["0%", "-115%"]);
+  const rightX = useTransform(smoothProgress, [0, 0.45], ["0%", "115%"]);
+  
+  const leftRotateY = useTransform(smoothProgress, [0, 0.45], [0, -40]);
+  const rightRotateY = useTransform(smoothProgress, [0, 0.45], [0, 40]);
+  
+  const leftRotateZ = useTransform(smoothProgress, [0, 0.45], [0, -8]);
+  const rightRotateZ = useTransform(smoothProgress, [0, 0.45], [0, 8]);
 
-  // Revealed Content Logic - Smooth scaling reveal
-  const revealScale = useTransform(smoothProgress, [0.1, 0.6], [0.92, 1]);
-  const revealOpacity = useTransform(smoothProgress, [0.1, 0.4], [0, 1]);
+  // Content revealed from depth
+  const revealScale = useTransform(smoothProgress, [0, 0.5], [0.85, 1]);
+  const revealZ = useTransform(smoothProgress, [0, 0.5], [-300, 0]);
+  const revealOpacity = useTransform(smoothProgress, [0, 0.35], [0, 1]);
 
-  // Jagged Edge Paths
-  const leftJagged = "polygon(0% 0%, 52% 0%, 48% 12%, 53% 25%, 47% 38%, 52% 52%, 48% 65%, 53% 78%, 47% 92%, 52% 100%, 0% 100%)";
-  const rightJagged = "polygon(52% 0%, 100% 0%, 100% 100%, 52% 100%, 47% 92%, 53% 78%, 48% 65%, 52% 52%, 47% 38%, 53% 25%, 48% 12%)";
+  // Precise Jagged Paths with a tiny overlap (50.1%) to prevent the "purple line" gap
+  const leftJagged = "polygon(0% 0%, 50.1% 0%, 48% 15%, 52% 35%, 48% 55%, 52% 75%, 48% 90%, 50.1% 100%, 0% 100%)";
+  const rightJagged = "polygon(49.9% 0%, 100% 0%, 100% 100%, 49.9% 100%, 48% 90%, 52% 75%, 48% 55%, 52% 35%, 48% 15%)";
 
   return (
-    <div ref={containerRef} className="relative h-[300vh] bg-[#0A0514]">
-      <div className="sticky top-0 h-screen w-full overflow-hidden perspective-[2000px]">
+    <div ref={containerRef} className="relative h-[400vh] bg-[#0A0514] perspective-2000 overflow-x-hidden">
+      <div className="sticky top-0 h-screen w-full overflow-hidden">
         
-        {/* REVEALED CONTENT (SERVICES) - The underlying layer */}
+        {/* THE VOID (REVEALED CONTENT) - Unified into main page flow */}
         <motion.div 
-          style={{ opacity: revealOpacity, scale: revealScale }}
-          className="absolute inset-0 z-0 bg-[#0A0514]"
+          style={{ 
+            opacity: revealOpacity, 
+            scale: revealScale,
+            z: revealZ,
+            transformStyle: 'preserve-3d'
+          }}
+          className="absolute inset-0 z-0 bg-[#0A0514] will-change-transform flex items-center justify-center pointer-events-auto"
         >
-          <Services onSelectService={onSelectService} />
+          <div className="w-full max-h-full">
+            <Services onSelectService={onSelectService} />
+          </div>
         </motion.div>
 
-        {/* TEARING TOP LAYER (HERO) - The top layer that splits */}
-        <div className="absolute inset-0 z-20 pointer-events-none flex">
-          {/* Left Paper Half */}
+        {/* THE PAPER (HERO TOP LAYER) */}
+        <div className="absolute inset-0 z-20 pointer-events-none w-full h-full transform-gpu">
+          
+          {/* Left Peel */}
           <motion.div 
             style={{ 
               x: leftX,
-              rotateZ: leftRotate,
+              rotateY: leftRotateY,
+              rotateZ: leftRotateZ,
               clipPath: leftJagged,
               originX: "0%",
-              originY: "50%"
+              originY: "50%",
+              transformStyle: 'preserve-3d'
             }}
-            className="absolute inset-0 w-full h-full pointer-events-auto bg-white"
+            className="absolute inset-0 w-full h-full pointer-events-auto bg-white will-change-transform"
           >
-            <div className="w-full h-full shadow-[50px_0_100px_rgba(0,0,0,0.15)] overflow-hidden">
-              <Hero onContact={onContact} />
+            <div className="w-full h-full shadow-[40px_0_80px_rgba(0,0,0,0.2)] overflow-hidden">
+              <Hero onContact={onContact} isInsideTear={true} />
             </div>
+            {/* Edge Shadow */}
+            <motion.div 
+               style={{ opacity: useTransform(smoothProgress, [0, 0.2], [0, 0.4]) }}
+               className="absolute top-0 right-[49%] bottom-0 w-40 bg-gradient-to-r from-transparent to-black/60 pointer-events-none"
+            />
           </motion.div>
 
-          {/* Right Paper Half */}
+          {/* Right Peel */}
           <motion.div 
             style={{ 
               x: rightX,
-              rotateZ: rightRotate,
+              rotateY: rightRotateY,
+              rotateZ: rightRotateZ,
               clipPath: rightJagged,
               originX: "100%",
-              originY: "50%"
+              originY: "50%",
+              transformStyle: 'preserve-3d'
             }}
-            className="absolute inset-0 w-full h-full pointer-events-auto bg-white"
+            className="absolute inset-0 w-full h-full pointer-events-auto bg-white will-change-transform"
           >
-            <div className="w-full h-full shadow-[-50px_0_100px_rgba(0,0,0,0.15)] overflow-hidden">
-              <Hero onContact={onContact} />
+            <div className="w-full h-full shadow-[-40px_0_80px_rgba(0,0,0,0.2)] overflow-hidden">
+              <Hero onContact={onContact} isInsideTear={true} />
             </div>
+            {/* Edge Shadow */}
+            <motion.div 
+               style={{ opacity: useTransform(smoothProgress, [0, 0.2], [0, 0.4]) }}
+               className="absolute top-0 left-[49%] bottom-0 w-40 bg-gradient-to-l from-transparent to-black/60 pointer-events-none"
+            />
           </motion.div>
         </div>
       </div>
