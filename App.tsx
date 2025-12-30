@@ -1,14 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import TopBar from './components/TopBar';
 import Navbar from './components/Navbar';
+import TopBar from './components/TopBar';
 import AboutPage from './components/AboutPage';
 import ContactPage from './components/ContactPage';
 import PortfolioPage from './components/PortfolioPage';
 import ContactStrip from './components/ContactStrip';
 import TearSection from './components/TearSection';
 import ServiceDetail from './components/ServiceDetail';
+import Services from './components/Services';
 import Portfolio from './components/Portfolio';
 import WorkProcess from './components/WorkProcess';
 import Testimonials from './components/Testimonials';
@@ -20,9 +21,9 @@ import { ViewState, Theme } from './types';
 const App: React.FC = () => {
   const [theme, setTheme] = useState<Theme>(() => {
     if (typeof window !== 'undefined') {
-      return (localStorage.getItem('theme') as Theme) || 'system';
+      return (localStorage.getItem('theme') as Theme) || 'dark';
     }
-    return 'system';
+    return 'dark';
   });
   
   const [isDarkMode, setIsDarkMode] = useState(true);
@@ -92,7 +93,8 @@ const App: React.FC = () => {
   const activeService = SERVICES.find(s => s.id === selectedServiceId) || null;
 
   return (
-    <div className="bg-white dark:bg-[#050505] min-h-screen text-black dark:text-white transition-colors duration-700">
+    <div className="bg-brandSurface-light dark:bg-brandSurface-dark min-h-screen text-black dark:text-white transition-colors duration-700">
+      <TopBar />
       <Navbar 
         isDarkMode={isDarkMode} 
         toggleTheme={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')} 
@@ -114,18 +116,13 @@ const App: React.FC = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              {/* VIOLET (Under Hero reveal) */}
-              <TearSection 
-                onSelectService={handleSelectService} 
-                onContact={() => handleNavigate('contact-page')} 
-              />
-              {/* WHITE */}
+              <TearSection onContact={() => handleNavigate('contact-page')} />
+              <div className="-mt-[100vh]">
+                <Services onSelectService={handleSelectService} />
+              </div>
               <Portfolio onViewAll={() => handleNavigate('portfolio-page')} />
-              {/* VIOLET */}
               <WorkProcess />
-              {/* WHITE */}
               <Testimonials />
-              {/* VIOLET */}
               <ContactStrip onContact={() => handleNavigate('contact-page')} />
             </motion.div>
           ) : currentView === 'about-page' ? (
@@ -145,7 +142,7 @@ const App: React.FC = () => {
         </AnimatePresence>
       </main>
       
-      <Footer />
+      <Footer onNavigate={handleNavigate} />
     </div>
   );
 };

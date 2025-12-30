@@ -21,24 +21,24 @@ const TopBar: React.FC = () => {
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 w-full z-[100] bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-black/5 dark:border-white/5 h-8 flex items-center overflow-hidden">
+    <div className="fixed top-0 left-0 w-full z-[100] bg-brandSurface-light dark:bg-brandSurface-dark border-b border-black/5 dark:border-white/5 h-10 flex items-center transition-colors duration-400">
       <div className="max-w-[95rem] mx-auto w-full px-6 md:px-12 flex justify-between items-center">
         
         {/* Left Side: Rotating Quotes */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-4">
           <motion.div 
-            animate={{ opacity: [0.2, 1, 0.2] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="w-1.5 h-1.5 rounded-full bg-brandPrimary shadow-[0_0_8px_#7C3AED]"
+            animate={{ opacity: [0.3, 1, 0.3], scale: [1, 1.2, 1] }}
+            transition={{ duration: 3, repeat: Infinity }}
+            className="w-1.5 h-1.5 rounded-full bg-brandPrimary shadow-[0_0_10px_#7C3AED]"
           />
           <AnimatePresence mode="wait">
             <motion.p
               key={quoteIndex}
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 10 }}
-              transition={{ duration: 0.8, ease: [0.23, 1, 0.32, 1] }}
-              className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-black/80 dark:text-white/80 whitespace-nowrap"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.6, ease: "circOut" }}
+              className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.25em] text-black/70 dark:text-white/70 whitespace-nowrap"
             >
               {BRAND_QUOTES[quoteIndex]}
             </motion.p>
@@ -46,28 +46,16 @@ const TopBar: React.FC = () => {
         </div>
 
         {/* Right Side: Social Media */}
-        <div className="flex items-center gap-5">
-          <motion.a 
-            href="#" 
-            whileHover={{ scale: 1.2, color: '#7C3AED' }}
-            className="text-black/40 dark:text-white/40 transition-all duration-500 ease-out"
-          >
+        <div className="flex items-center gap-6">
+          <a href="#" className="text-black/30 dark:text-white/20 hover:text-brandPrimary transition-all duration-300 transform hover:scale-110">
             <Instagram size={14} />
-          </motion.a>
-          <motion.a 
-            href="#" 
-            whileHover={{ scale: 1.2, color: '#7C3AED' }}
-            className="text-black/40 dark:text-white/40 transition-all duration-500 ease-out"
-          >
+          </a>
+          <a href="#" className="text-black/30 dark:text-white/20 hover:text-brandPrimary transition-all duration-300 transform hover:scale-110">
             <XLogo />
-          </motion.a>
-          <motion.a 
-            href="#" 
-            whileHover={{ scale: 1.2, color: '#7C3AED' }}
-            className="text-black/40 dark:text-white/40 transition-all duration-500 ease-out"
-          >
+          </a>
+          <a href="#" className="text-black/30 dark:text-white/20 hover:text-brandPrimary transition-all duration-300 transform hover:scale-110">
             <Linkedin size={14} />
-          </motion.a>
+          </a>
         </div>
 
       </div>

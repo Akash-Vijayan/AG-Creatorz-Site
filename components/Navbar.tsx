@@ -55,34 +55,31 @@ const Navbar: React.FC<NavbarProps> = ({
   ];
 
   return (
-    <div className="fixed w-full z-[100] top-0 left-0">
-      {/* Top Banner Socials */}
-      <div className="w-full bg-white/80 dark:bg-black/80 backdrop-blur-md border-b border-black/5 dark:border-white/5 py-2 hidden md:block">
+    <div className="fixed w-full z-[120] top-0 left-0">
+      {/* Top Protocol Strip */}
+      <div className="w-full bg-brandSurface-light/60 dark:bg-brandSurface-dark/60 backdrop-blur-md border-b border-black/5 dark:border-white/5 py-1.5 hidden md:block">
         <div className="max-w-[95rem] mx-auto px-12 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-brandPrimary animate-pulse" />
-            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-black/50 dark:text-white/40">Your Digital Evolution Starts Here. 📖</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-brandPrimary animate-pulse shadow-[0_0_8px_#7C3AED]" />
+            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-black/40 dark:text-white/40">Studio Registry // Secure Transmission v2.8</span>
           </div>
           <div className="flex items-center gap-6 text-black/40 dark:text-white/30">
-            <a href="#" className="hover:text-brandPrimary transition-colors"><Instagram size={14} /></a>
+            <a href="#" className="hover:text-brandPrimary transition-colors"><Instagram size={13} /></a>
             <a href="#" className="hover:text-brandPrimary transition-colors"><XLogo /></a>
-            <a href="#" className="hover:text-brandPrimary transition-colors"><Linkedin size={14} /></a>
+            <a href="#" className="hover:text-brandPrimary transition-colors"><Linkedin size={13} /></a>
           </div>
         </div>
       </div>
 
       <nav 
-        className={`w-full transition-all duration-700 ease-out flex items-center ${
-          scrolled 
-            ? 'bg-white/90 dark:bg-black/95 backdrop-blur-2xl py-4 border-b border-black/5 dark:border-white/5 shadow-xl' 
-            : 'bg-transparent py-6 md:py-8'
+        className={`w-full transition-all duration-500 ease-out flex items-center glass-nav ${
+          scrolled ? 'py-3' : 'py-5'
         }`}
       >
         <div className="max-w-[95rem] mx-auto px-6 md:px-12 w-full">
           <div className="flex justify-between items-center">
             
-            {/* Left Group: Back Button + Logo */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 md:gap-8">
               <AnimatePresence>
                 {showBack && (
                   <motion.button
@@ -90,48 +87,48 @@ const Navbar: React.FC<NavbarProps> = ({
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -10 }}
                     onClick={onBack}
-                    className="flex items-center gap-2 text-black/40 dark:text-white/40 hover:text-brandPrimary transition-colors group/back"
+                    className="flex items-center gap-2 text-black/40 dark:text-white/40 hover:text-brandPrimary transition-colors group/back pr-4 border-r border-black/5 dark:border-white/5"
                   >
-                    <ArrowLeft size={16} className="group-hover/back:-translate-x-1 transition-transform" />
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">Back</span>
+                    <ArrowLeft size={16} className="group-hover/back:-translate-x-1.5 transition-transform" />
+                    <span className="text-[10px] font-black uppercase tracking-[0.2em] hidden sm:inline">Return</span>
                   </motion.button>
                 )}
               </AnimatePresence>
 
               <div 
-                className="flex items-center gap-4 cursor-pointer group" 
+                className="flex items-center gap-3 md:gap-4 cursor-pointer group" 
                 onClick={(e) => handleLinkClick(e, 'home', 'hero')}
               >
-                <img src={LOGO_PATH} alt="AG" className="h-10 w-auto dark:invert group-hover:scale-110 transition-transform duration-500" />
-                <span className="font-display font-black text-xl tracking-tighter text-black dark:text-white uppercase leading-none">
+                <img src={LOGO_PATH} alt="AG" className="h-7 md:h-9 w-auto dark:invert group-hover:scale-105 transition-transform duration-500" />
+                <span className="font-display font-black text-lg md:text-xl tracking-tighter text-black dark:text-white uppercase leading-none">
                   AG CREATORZ<span className="text-brandPrimary">.</span>
                 </span>
               </div>
             </div>
             
-            {/* Nav Links */}
-            <div className="hidden md:flex items-center space-x-12">
-              <div className="flex items-center space-x-10">
+            <div className="hidden lg:flex items-center space-x-10">
+              <div className="flex items-center space-x-8">
                 {navLinks.map((link) => (
                   <a 
                     key={link.name}
                     href="#" 
                     onClick={(e) => handleLinkClick(e, link.page, link.section)} 
-                    className={`text-[11px] font-black uppercase tracking-[0.3em] transition-all relative group ${
+                    className={`text-[10px] font-black uppercase tracking-[0.3em] transition-all relative group ${
                       currentPage === link.page ? 'text-brandPrimary' : 'text-black/60 dark:text-white/60 hover:text-brandPrimary'
                     }`}
                   >
                     {link.name}
-                    <span className={`absolute -bottom-2 left-0 h-[2px] bg-brandPrimary transition-all duration-500 ${currentPage === link.page ? 'w-full' : 'w-0 group-hover:w-full'}`} />
+                    <span className={`absolute -bottom-1.5 left-0 h-[2px] bg-brandPrimary transition-all duration-500 ${currentPage === link.page ? 'w-full' : 'w-0 group-hover:w-full'}`} />
                   </a>
                 ))}
 
+                {/* Services Dropdown */}
                 <div 
                   className="relative"
                   onMouseEnter={() => setServicesDropdown(true)}
                   onMouseLeave={() => setServicesDropdown(false)}
                 >
-                  <button className="text-[11px] font-black text-black/60 dark:text-white/60 hover:text-brandPrimary uppercase tracking-[0.3em] flex items-center gap-2 transition-all">
+                  <button className="text-[10px] font-black text-black/60 dark:text-white/60 hover:text-brandPrimary uppercase tracking-[0.3em] flex items-center gap-2 transition-all">
                     Services <ChevronDown size={12} className={`transition-transform duration-500 ${servicesDropdown ? 'rotate-180' : ''}`} />
                   </button>
                   <AnimatePresence>
@@ -140,14 +137,14 @@ const Navbar: React.FC<NavbarProps> = ({
                         initial={{ opacity: 0, y: 15 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 10 }}
-                        className="absolute top-full -left-4 pt-6 w-64"
+                        className="absolute top-full -left-6 pt-5 w-64"
                       >
-                        <div className="bg-white dark:bg-black border border-black/5 dark:border-white/10 rounded-[2rem] shadow-2xl p-4 backdrop-blur-3xl overflow-hidden">
+                        <div className="bg-brandSurface-light dark:bg-brandSurface-dark border border-black/10 dark:border-white/10 rounded-[2rem] shadow-2xl p-4 backdrop-blur-3xl overflow-hidden">
                           {SERVICES.map((s) => (
                             <button
                               key={s.id}
                               onClick={() => { onSelectService(s.id); setServicesDropdown(false); }}
-                              className="w-full text-left px-5 py-4 rounded-2xl hover:bg-brandPrimary/10 text-black/70 dark:text-white/70 hover:text-brandPrimary transition-all uppercase text-[10px] font-bold tracking-widest"
+                              className="w-full text-left px-4 py-3.5 rounded-xl hover:bg-brandPrimary/10 text-black/70 dark:text-white/70 hover:text-brandPrimary transition-all uppercase text-[9px] font-black tracking-[0.2em]"
                             >
                               {s.title}
                             </button>
@@ -159,28 +156,64 @@ const Navbar: React.FC<NavbarProps> = ({
                 </div>
               </div>
 
-              <div className="flex items-center gap-10 pl-10 border-l border-black/5 dark:border-white/10">
+              <div className="flex items-center gap-6 pl-8 border-l border-black/10 dark:border-white/10">
                  <button onClick={toggleTheme} className="text-black/60 dark:text-white/60 hover:text-brandPrimary transition-colors">
-                   {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+                   {isDarkMode ? <Sun size={18} /> : <Moon size={18} />}
                  </button>
                  
                  <button 
                    onClick={(e) => handleLinkClick(e as any, 'contact-page')}
-                   className="px-10 py-4 bg-white dark:bg-white text-black rounded-full text-[11px] font-black uppercase tracking-widest hover:bg-brandPrimary hover:text-white transition-all shadow-xl active:scale-95"
+                   className="px-7 py-3 bg-brandPrimary text-white rounded-full text-[9px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg shadow-brandPrimary/20"
                  >
                    Let's Talk
                  </button>
               </div>
             </div>
 
-            {/* Mobile Burger */}
-            <div className="md:hidden flex items-center gap-6">
-              <button onClick={toggleTheme} className="text-black dark:text-white">{isDarkMode ? <Sun size={24} /> : <Moon size={24} />}</button>
-              <button onClick={() => setIsOpen(!isOpen)} className="text-black dark:text-white">{isOpen ? <X size={32} /> : <Menu size={32} />}</button>
+            <div className="lg:hidden flex items-center gap-5">
+              <button onClick={toggleTheme} className="text-black dark:text-white">{isDarkMode ? <Sun size={20} /> : <Moon size={20} />}</button>
+              <button onClick={() => setIsOpen(!isOpen)} className="text-black dark:text-white">{isOpen ? <X size={26} /> : <Menu size={26} />}</button>
             </div>
           </div>
         </div>
       </nav>
+
+      {/* Mobile Menu */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: '100%' }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: '100%' }}
+            className="fixed inset-0 bg-brandSurface-light dark:bg-brandSurface-dark z-[200] flex flex-col p-10 lg:hidden"
+          >
+            <div className="flex justify-between items-center mb-16">
+              <img src={LOGO_PATH} alt="AG" className="h-9 dark:invert" />
+              <X size={32} onClick={() => setIsOpen(false)} />
+            </div>
+            <div className="flex flex-col gap-10">
+              {navLinks.map((link) => (
+                <a 
+                  key={link.name}
+                  href="#" 
+                  onClick={(e) => handleLinkClick(e, link.page, link.section)}
+                  className="text-5xl font-display font-bold uppercase tracking-tighter"
+                >
+                  {link.name}
+                </a>
+              ))}
+              <div className="pt-12 border-t border-black/10 dark:border-white/10 mt-10">
+                <button 
+                  onClick={(e) => handleLinkClick(e as any, 'contact-page')}
+                  className="w-full py-6 bg-brandPrimary text-white rounded-[2rem] text-sm font-black uppercase tracking-[0.3em]"
+                >
+                  Initiate Project
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

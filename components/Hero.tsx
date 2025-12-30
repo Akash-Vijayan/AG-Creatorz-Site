@@ -12,8 +12,7 @@ const Hero: React.FC<HeroProps> = ({ onContact, isInsideTear = false }) => {
   const containerRef = useRef(null);
   const { scrollY } = useScroll();
   
-  // Disable parallax transforms if inside the tear to keep the 'paper' texture static
-  const yParallax = useTransform(scrollY, [0, 800], [0, isInsideTear ? 0 : -120]);
+  const yParallax = useTransform(scrollY, [0, 800], [0, isInsideTear ? 0 : -100]);
   const opacityText = useTransform(scrollY, [0, 500], [1, isInsideTear ? 1 : 0]);
   const scaleHero = useTransform(scrollY, [0, 500], [1, isInsideTear ? 1 : 0.98]);
 
@@ -37,7 +36,7 @@ const Hero: React.FC<HeroProps> = ({ onContact, isInsideTear = false }) => {
     <section 
       ref={containerRef} 
       id="hero" 
-      className="relative w-full h-[100svh] flex flex-col items-center justify-center overflow-hidden bg-white dark:bg-[#050505] px-6 transition-colors duration-1000"
+      className="relative w-full min-h-[100svh] flex flex-col items-center justify-center overflow-hidden bg-brandSurface-light dark:bg-brandSurface-dark px-4 sm:px-6 pt-32 transition-colors duration-1000"
     >
       <motion.div 
         style={{ y: yParallax, opacity: opacityText, scale: scaleHero }}
@@ -51,15 +50,15 @@ const Hero: React.FC<HeroProps> = ({ onContact, isInsideTear = false }) => {
         >
           <div className="flex items-center gap-3">
              <div className="w-1.5 h-1.5 rounded-full bg-brandPrimary animate-pulse" />
-             <span className="text-brandPrimary text-[9px] font-black uppercase tracking-[0.6em] px-4 py-2 border border-brandPrimary/10 rounded-full bg-brandPrimary/5 backdrop-blur-md">
+             <span className="text-brandPrimary text-[9px] font-black uppercase tracking-[0.5em] px-4 py-2 border border-brandPrimary/15 rounded-full bg-brandPrimary/5 backdrop-blur-md">
                Crafting Digital Legacies
              </span>
           </div>
         </motion.div>
 
-        <div className="text-center w-full">
-          <h1 className="font-display font-bold text-huge tracking-tighter text-black dark:text-white uppercase leading-[0.9]">
-            <div className="overflow-hidden pb-1">
+        <div className="text-center w-full px-2">
+          <h1 className="font-display font-bold text-huge tracking-tighter text-black dark:text-white uppercase leading-[0.85] mb-4">
+            <div className="overflow-hidden pb-1 sm:pb-2">
               {splitText("BUILDING DIGITAL", isInsideTear ? 0 : 0.2)}
             </div>
             <div className="overflow-hidden flex flex-wrap justify-center items-baseline gap-y-2">
@@ -81,7 +80,7 @@ const Hero: React.FC<HeroProps> = ({ onContact, isInsideTear = false }) => {
             initial={isInsideTear ? { opacity: 1 } : { opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.4, duration: 1.2 }}
-            className="mt-10 text-base md:text-lg text-black/50 dark:text-white/30 font-light max-w-lg mx-auto leading-relaxed tracking-wide"
+            className="mt-8 text-base sm:text-lg text-black/50 dark:text-white/30 font-light max-w-xl mx-auto leading-relaxed tracking-wide"
           >
             {HERO_CONTENT.subhead}
           </motion.p>
@@ -91,13 +90,13 @@ const Hero: React.FC<HeroProps> = ({ onContact, isInsideTear = false }) => {
           initial={isInsideTear ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.8, duration: 0.8 }}
-          className="mt-12 flex flex-wrap justify-center gap-6"
+          className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-5 w-full px-6 sm:px-0"
         >
           <motion.button 
             whileHover={{ scale: 1.05, backgroundColor: '#7C3AED', color: '#fff' }}
             whileTap={{ scale: 0.95 }}
             onClick={onContact}
-            className="px-10 py-4 bg-black dark:bg-white text-white dark:text-black rounded-full font-black uppercase tracking-widest text-[11px] transition-all shadow-xl"
+            className="w-full sm:w-auto px-10 py-4 bg-black dark:bg-brandPrimary text-white rounded-full font-black uppercase tracking-[0.2em] text-[11px] transition-all shadow-xl shadow-brandPrimary/10"
           >
             Start Project
           </motion.button>
@@ -105,7 +104,7 @@ const Hero: React.FC<HeroProps> = ({ onContact, isInsideTear = false }) => {
             whileHover={{ scale: 1.05, borderColor: '#7C3AED', color: '#7C3AED' }}
             whileTap={{ scale: 0.95 }}
             href="#portfolio" 
-            className="px-10 py-4 border border-black/10 dark:border-white/10 text-black dark:text-white rounded-full font-black uppercase tracking-widest text-[11px] transition-all"
+            className="w-full sm:w-auto px-10 py-4 border border-black/10 dark:border-white/10 text-black dark:text-white rounded-full font-black uppercase tracking-[0.2em] text-[11px] transition-all text-center"
           >
             View Work
           </motion.a>
@@ -115,11 +114,11 @@ const Hero: React.FC<HeroProps> = ({ onContact, isInsideTear = false }) => {
       {!isInsideTear && (
         <motion.div 
           animate={{ 
-            opacity: [0.02, 0.05, 0.02],
-            scale: [1, 1.1, 1]
+            opacity: [0.03, 0.08, 0.03],
+            scale: [1, 1.15, 1]
           }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-[-10%] left-1/2 -translate-x-1/2 w-[80%] h-[50%] bg-brandPrimary/20 blur-[150px] rounded-full pointer-events-none -z-10"
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[-15%] left-1/2 -translate-x-1/2 w-[90%] h-[60%] bg-brandPrimary/15 blur-[180px] rounded-full pointer-events-none -z-10"
         />
       )}
     </section>

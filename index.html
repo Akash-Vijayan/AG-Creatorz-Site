@@ -4,13 +4,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AG Creatorz — Building Digital Experiences</title>
-    <meta name="description" content="AG Creatorz — A premium digital studio crafting cinematic web experiences." />
+    <title>AG Creatorz — Premium Digital Studio</title>
+    <meta name="description" content="AG Creatorz — Crafting high-performance web engineering and cinematic brand narratives." />
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -30,6 +30,14 @@
                 light: '#A78BFA',
                 dark: '#5B21B6',
               },
+              brandSurface: {
+                light: '#FAFAFA',
+                dark: '#050505',
+              },
+              brandCard: {
+                light: '#FFFFFF',
+                dark: '#0A0A0A',
+              }
             },
           }
         }
@@ -37,25 +45,31 @@
     </script>
     <style>
       :root {
-        /* Adjusted size for a more refined aesthetic: "not too big" */
-        --fluid-text-huge: clamp(1.8rem, 1rem + 4vw, 5.5rem);
+        /* Adjusted clamp to be slightly more conservative to prevent navigation overlap */
+        --fluid-text-huge: clamp(2.4rem, 12vw, 7.8rem);
       }
 
       html {
         font-size: 16px; 
-        scroll-behavior: auto;
+        scroll-behavior: smooth;
         -webkit-font-smoothing: antialiased;
       }
       
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #000;
-        color: #fff;
+        background-color: #FAFAFA;
+        color: #111;
         margin: 0;
         overflow-x: hidden;
+        transition: background-color 0.4s ease;
       }
 
-      /* Cinematic Grain Overlay */
+      html.dark body {
+        background-color: #050505;
+        color: #fff;
+      }
+
+      /* Premium Texture Overlay */
       body::before {
         content: "";
         position: fixed;
@@ -70,17 +84,27 @@
         filter: contrast(150%) brightness(100%);
       }
 
-      .text-huge { font-size: var(--fluid-text-huge); line-height: 1.0; }
+      .text-huge { font-size: var(--fluid-text-huge); line-height: 0.85; letter-spacing: -0.05em; }
       
-      ::-webkit-scrollbar { width: 4px; }
+      ::-webkit-scrollbar { width: 5px; }
       ::-webkit-scrollbar-thumb { background: #7C3AED; border-radius: 10px; }
-
-      .horizontal-mask {
-        mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+      
+      .glass-nav {
+        background: rgba(250, 250, 250, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
       }
 
-      .perspective-2000 {
-        perspective: 2000px;
+      .dark .glass-nav {
+        background: rgba(5, 5, 5, 0.85);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      @media (max-width: 640px) {
+        :root {
+          --fluid-text-huge: clamp(2.8rem, 16vw, 4.8rem);
+        }
       }
     </style>
     <script type="importmap">

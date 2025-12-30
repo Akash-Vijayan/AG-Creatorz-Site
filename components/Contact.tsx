@@ -2,6 +2,7 @@
 import React, { useState, FormEvent } from 'react';
 import { motion } from 'framer-motion';
 import { Send, CheckCircle, Loader2, Instagram, Mail, MessageCircle } from 'lucide-react';
+import { CONTACT_INFO } from '../constants';
 
 const Contact: React.FC = () => {
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
@@ -22,15 +23,18 @@ const Contact: React.FC = () => {
             </h2>
             <div className="space-y-8 mt-16">
               {[
-                { icon: <Mail size={24} />, text: "hello@agcreators.com" },
-                { icon: <Instagram size={24} />, text: "@ag.creators" },
-                { icon: <MessageCircle size={24} />, text: "+91 89035 74460" }
+                { icon: <Mail size={24} />, text: CONTACT_INFO.email, sub: null },
+                { icon: <Instagram size={24} />, text: "@ag.creators", sub: null },
+                { icon: <MessageCircle size={24} />, text: CONTACT_INFO.phone, sub: CONTACT_INFO.phoneNote }
               ].map((link, i) => (
                 <div key={i} className="flex items-center gap-6 group cursor-pointer">
                   <div className="w-16 h-16 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center text-brandPrimary group-hover:bg-brandPrimary group-hover:text-white transition-all">
                     {link.icon}
                   </div>
-                  <span className="font-bold text-xl">{link.text}</span>
+                  <div className="flex flex-col">
+                    <span className="font-bold text-xl break-all">{link.text}</span>
+                    {link.sub && <span className="text-[10px] font-mono text-brandPrimary uppercase tracking-widest">{link.sub}</span>}
+                  </div>
                 </div>
               ))}
             </div>

@@ -1,6 +1,13 @@
 
 import { Service, PortfolioItem, Testimonial, FaqItem } from './types';
 
+export const CONTACT_INFO = {
+  email: "ag.creatorz.official@gmail.com",
+  phone: "+91 89035 74460",
+  phoneNote: "WhatsApp Call & Message Only",
+  address: "Chunkankadai, Nagercoil - 629 003, Kanyakumari Dist, Tamil Nadu, India"
+};
+
 export const BRAND_QUOTES = [
   "Turning abstract visions into digital reality. ✨",
   "Design that speaks louder than words. 🎨",

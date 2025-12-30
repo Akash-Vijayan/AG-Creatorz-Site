@@ -1,145 +1,109 @@
 
-import React, { useRef } from 'react';
-import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
-import { Globe, Box, PlayCircle, ArrowRight, Sparkles } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { SERVICES } from '../constants';
+import { ArrowRight, Globe, Box, PlayCircle } from 'lucide-react';
 
 interface ServicesProps {
   onSelectService: (serviceId: string) => void;
 }
 
-const SERVICES_DATA = [
-  {
-    id: 'web',
-    title: 'Web Engineering',
-    description: 'Modern, high-performance websites built for scalability and professional presence.',
-    icon: <Globe size={28} />,
-  },
-  {
-    id: 'design',
-    title: 'Graphic Design',
-    description: 'Impactful visual identities created to communicate your brand clearly.',
-    icon: <Box size={28} />,
-  },
-  {
-    id: 'video',
-    title: 'Video Editing',
-    description: 'Engaging edits focused on retention, flow, and high-quality storytelling.',
-    icon: <PlayCircle size={28} />,
-  }
-];
-
 const Services: React.FC<ServicesProps> = ({ onSelectService }) => {
   return (
     <section 
       id="services" 
-      className="relative w-full py-6 md:py-10 bg-transparent overflow-visible"
+      className="relative py-20 sm:py-32 bg-white dark:bg-[#050505] transition-colors duration-1000 overflow-hidden"
     >
-      <div className="max-w-[85rem] mx-auto px-6 md:px-12 w-full relative z-10">
+      {/* Background Decorative Grid */}
+      <div className="absolute inset-0 opacity-[0.02] sm:opacity-[0.03] pointer-events-none" 
+           style={{ backgroundImage: 'linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+
+      <div className="max-w-[90rem] mx-auto px-6 md:px-12 relative z-10">
         
-        {/* Header Section - More Compact */}
-        <div className="flex flex-col items-center text-center mb-10 space-y-3">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10"
-          >
-            <Sparkles size={10} className="text-brandPrimary-light" />
-            <span className="text-brandPrimary-light text-[8px] font-black uppercase tracking-[0.4em]">Expert Registry</span>
-          </motion.div>
-          
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white uppercase tracking-tighter leading-none">
-            DIGITAL <span className="italic font-serif font-normal text-brandPrimary-light lowercase">services</span>
-          </h2>
-          
-          <p className="text-white/40 text-[11px] md:text-xs font-light max-w-lg leading-relaxed px-4">
-            Professional digital solutions designed to strengthen online presence through clarity and reliable execution.
-          </p>
+        {/* Section Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-16 sm:mb-24 border-b border-black/5 dark:border-white/5 pb-8 sm:pb-12">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-6 sm:w-8 h-[1px] bg-brandPrimary" />
+              <span className="text-[9px] sm:text-[10px] font-mono font-black uppercase tracking-[0.4em] sm:tracking-[0.5em] text-brandPrimary">Capability Archive</span>
+            </div>
+            <h2 className="text-4xl sm:text-7xl font-display font-bold uppercase tracking-tighter leading-none">
+              OUR <span className="text-brandPrimary italic font-serif lowercase font-normal">Expertise</span>
+            </h2>
+          </div>
+          <div className="hidden md:block max-w-[240px] text-right">
+             <p className="text-black/40 dark:text-white/20 text-[10px] font-mono uppercase tracking-widest leading-relaxed">
+               Disciplined digital execution across three core domains of the modern web.
+             </p>
+          </div>
         </div>
 
-        {/* 3D Service Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 perspective-2000">
-          {SERVICES_DATA.map((service, i) => (
-            <ServiceCard 
-              key={service.id} 
-              service={service} 
-              index={i} 
-              onClick={() => onSelectService(service.id)} 
-            />
+        {/* Services List - Architectural Stack */}
+        <div className="space-y-4 sm:space-y-6">
+          {SERVICES.map((service, i) => (
+            <motion.div
+              key={service.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
+              className="group"
+              onClick={() => onSelectService(service.id)}
+            >
+              <div className="relative flex flex-col md:flex-row gap-6 md:gap-16 p-8 sm:p-14 rounded-[2rem] sm:rounded-[2.5rem] bg-black/[0.02] dark:bg-white/[0.02] border border-black/5 dark:border-white/5 hover:border-brandPrimary/30 transition-all duration-700 cursor-pointer overflow-hidden">
+                
+                {/* Visual Number Indicator */}
+                <div className="absolute top-6 right-6 sm:top-10 sm:right-10 text-6xl sm:text-9xl font-display font-black text-black/[0.03] dark:text-white/[0.02] group-hover:text-brandPrimary/5 transition-colors pointer-events-none">
+                  0{i + 1}
+                </div>
+
+                {/* Left: Icon & Category */}
+                <div className="flex flex-col gap-6 w-12 sm:w-24 shrink-0">
+                   <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-brandPrimary/5 text-brandPrimary flex items-center justify-center group-hover:bg-brandPrimary group-hover:text-white transition-all duration-500 shadow-xl">
+                      {service.icon === 'web' ? <Globe className="w-6 h-6 sm:w-7 sm:h-7" /> : null}
+                      {service.icon === 'design' ? <Box className="w-6 h-6 sm:w-7 sm:h-7" /> : null}
+                      {service.icon === 'video' ? <PlayCircle className="w-6 h-6 sm:w-7 sm:h-7" /> : null}
+                   </div>
+                </div>
+
+                {/* Center: Title & Description */}
+                <div className="flex-1 space-y-4 sm:space-y-6 relative z-10">
+                  <div className="space-y-2 sm:space-y-3">
+                    <h3 className="text-2xl sm:text-5xl font-display font-bold uppercase tracking-tight text-black dark:text-white group-hover:text-brandPrimary transition-colors duration-500">
+                      {service.title}
+                    </h3>
+                    <p className="text-sm sm:text-lg text-black/50 dark:text-white/40 leading-relaxed font-light max-w-2xl">
+                      {service.description}
+                    </p>
+                  </div>
+                  
+                  {/* Service Keywords */}
+                  <div className="flex flex-wrap gap-2 pt-1 sm:pt-2">
+                    {service.details?.features.slice(0, 3).map((feat, idx) => (
+                      <span key={idx} className="px-3 py-1 rounded-full border border-black/5 dark:border-white/5 text-[8px] sm:text-[9px] font-mono font-bold uppercase tracking-widest text-black/60 dark:text-white/30 whitespace-nowrap">
+                        {feat}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Right: Pricing & Action */}
+                <div className="flex flex-row md:flex-col justify-between items-center md:items-end shrink-0 relative z-10 pt-4 md:pt-0 border-t md:border-t-0 border-black/5">
+                  <div className="text-left md:text-right">
+                    <span className="text-[8px] font-mono text-black/30 dark:text-white/20 uppercase tracking-widest block mb-1">Engage</span>
+                    <span className="text-xl sm:text-3xl font-mono font-bold text-black dark:text-white">{service.price}</span>
+                  </div>
+                  
+                  <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full border border-black/10 dark:border-white/10 flex items-center justify-center group-hover:bg-brandPrimary group-hover:text-white group-hover:border-brandPrimary transition-all duration-500 shadow-lg">
+                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </div>
+              </div>
+            </motion.div>
           ))}
-        </div>
-
-        {/* Section Action */}
-        <div className="mt-10 flex justify-center">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="group relative px-8 py-3.5 bg-white text-black rounded-full font-black uppercase tracking-[0.2em] text-[10px] shadow-2xl transition-all"
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              Explore All Services <ArrowRight size={14} />
-            </span>
-          </motion.button>
         </div>
       </div>
     </section>
-  );
-};
-
-const ServiceCard: React.FC<{ 
-  service: any; 
-  index: number; 
-  onClick: () => void;
-}> = ({ service, index, onClick }) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, -10]), { stiffness: 100, damping: 20 });
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-10, 10]), { stiffness: 100, damping: 20 });
-
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    mouseX.set((event.clientX - rect.left) / rect.width - 0.5);
-    mouseY.set((event.clientY - rect.top) / rect.height - 0.5);
-  };
-
-  return (
-    <motion.div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={() => { mouseX.set(0); mouseY.set(0); }}
-      onClick={onClick}
-      style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
-      className="group relative cursor-pointer transform-gpu"
-    >
-      <div 
-        className="relative bg-[#120B26]/60 border border-white/5 rounded-[2rem] p-8 h-full flex flex-col justify-between shadow-2xl transition-all duration-700 group-hover:border-brandPrimary/40 backdrop-blur-xl min-h-[340px]"
-        style={{ transformStyle: 'preserve-3d' }}
-      >
-        <div className="relative z-10" style={{ transform: 'translateZ(30px)' }}>
-          <div className="w-12 h-12 rounded-xl bg-white/[0.03] border border-white/10 flex items-center justify-center text-brandPrimary-light group-hover:bg-brandPrimary group-hover:text-white transition-all duration-500 mb-6">
-            {service.icon}
-          </div>
-
-          <h3 className="text-xl md:text-2xl font-display font-bold text-white uppercase tracking-tight leading-none mb-3 group-hover:translate-x-1 transition-transform">
-            {service.title}
-          </h3>
-          
-          <p className="text-white/40 text-[11px] leading-relaxed font-light group-hover:text-white/60 transition-colors">
-            {service.description}
-          </p>
-        </div>
-
-        <div className="relative z-10 pt-6 mt-6 border-t border-white/5 flex justify-between items-center" style={{ transform: 'translateZ(50px)' }}>
-          <span className="text-[9px] font-mono font-bold text-brandPrimary-light uppercase tracking-widest">Protocol.0{index+1}</span>
-          <div className="w-8 h-8 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-brandPrimary group-hover:text-white transition-all">
-            <ArrowRight size={14} />
-          </div>
-        </div>
-      </div>
-    </motion.div>
   );
 };
 

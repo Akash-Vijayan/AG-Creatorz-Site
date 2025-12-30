@@ -1,302 +1,378 @@
 
 import React, { useEffect, useState, useRef } from 'react';
-import { motion, useSpring, useMotionValue, useTransform, AnimatePresence, useScroll } from 'framer-motion';
-import { Moon, Sun, X, Bot, Sparkles, Copy, MessageCircle, Send, Heart, Laptop } from 'lucide-react';
+import { motion, useSpring, useMotionValue, useTransform, AnimatePresence } from 'framer-motion';
+import { X, Bot, Sparkles, Send, Zap, Code, Layout, Video, Heart, Activity, Bell, MessageSquare } from 'lucide-react';
 import { GoogleGenAI } from "@google/genai";
 import { Theme } from '../types';
+import { CONTACT_INFO } from '../constants';
 
 interface AiCompanionProps {
   currentTheme: Theme;
   onSetTheme: (theme: Theme) => void;
 }
 
-const SECTION_MESSAGES: Record<string, string[]> = {
-  hero: ["Welcome! I'm so glad you're here. ✨", "Let's build something beautiful today. 🚀"],
-  about: ["I love the vision behind this brand! 🎨", "Every project has a unique story. 📂"],
-  services: ["What can we create for you today? ⚙️", "I'm ready to bring your ideas to life! 🛠️"],
-  portfolio: ["I'm so proud of these projects! 💎", "Notice the detail in this one? 📸"],
-  process: ["We make the complex feel simple. ⚡", "Precision is our love language. 🎯"],
-  contact: ["I'm waiting to hear from you! 📡", "Let's start our journey together. 📬"]
-};
+const QUICK_PROMPTS = [
+  { label: "Web Pricing", icon: <Code size={12} />, text: "Hii AG! Tell me about Web pricing. ✨" },
+  { label: "Logo Design", icon: <Layout size={12} />, text: "I need a cute logo! How do we start? 🎨" },
+  { label: "Portfolio", icon: <Sparkles size={12} />, text: "Show me the magic you've built! 💎" }
+];
 
-const SYSTEM_INSTRUCTION = `You are 'AG', the friendly and enthusiastic creative spirit of AG Creatorz. 
-You are a passionate design enthusiast and tech helper. 
-Your tone is warm, encouraging, premium, and very helpful. 
-You love talking about Web development (₹2500+), Graphic Design (₹500+), and Video Editing (₹1000+).
-Keep responses concise but filled with creative energy and professional emojis like ✨, 🚀, 🎨, and 💎. 
-Your goal is to make the user feel inspired and supported.`;
+const SYSTEM_INSTRUCTION = `You are 'AG', the adorable, super-intelligent digital spirit of AG Creatorz studio. 
+Your personality: EXTREMELY CUTE, friendly, and helpful. You love emojis and digital sparkles.
+Key Traits:
+- Say "Hii!" or "Hewwo!" often.
+- Use "Bye-bye!" or "See ya!" when ending.
+- Knowledge: Web Engineering (starts ₹2,500), Brand Design (starts ₹500), Video Edits (starts ₹1,000).
+- Creator: Akash (${CONTACT_INFO.email} / ${CONTACT_INFO.phone} - ${CONTACT_INFO.phoneNote}).
+- Location: ${CONTACT_INFO.address}.
+- Be concise but very sweet. Use ✨, 💖, 🚀, 🎀, 🧸.`;
 
 const AiCompanion: React.FC<AiCompanionProps> = ({ currentTheme, onSetTheme }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [message, setMessage] = useState("Hi there! Ready to create?");
-  const [activeSection, setActiveSection] = useState('hero');
-  const [interactionState, setInteractionState] = useState<'normal' | 'happy' | 'thinking' | 'dizzy' | 'blink'>('normal');
+  const [interactionState, setInteractionState] = useState<'normal' | 'happy' | 'thinking' | 'blink' | 'wave' | 'love'>('normal');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [chatInput, setChatInput] = useState("");
   const [chatHistory, setChatHistory] = useState<{role: 'user' | 'model', text: string}[]>([
-    { role: 'model', text: "Hello! I'm AG. I'd love to help you build your dream brand with AG Creatorz. What's on your mind? ✨" }
+    { role: 'model', text: "Hii! I'm AG! I'm so happy you're here! Let's build something magical together! ✨💖" }
   ]);
   const [isTyping, setIsTyping] = useState(false);
-  const [botCenter, setBotCenter] = useState({ x: 0, y: 0 });
+  const [liveUsers, setLiveUsers] = useState(1);
+  const [showNotification, setShowNotification] = useState(false);
 
   const botRef = useRef<HTMLDivElement>(null);
-  const blinkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const chatEndRef = useRef<HTMLDivElement>(null);
 
-  const { scrollYProgress } = useScroll();
-  const pathLength = useSpring(scrollYProgress, { stiffness: 400, damping: 90 });
+  // Simulated Presence Monitoring
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const users = Math.floor(Math.random() * 8) + 1;
+      setLiveUsers(users);
+      // Randomly notify that "someone else" is starting a chat (Social Proof)
+      if (Math.random() > 0.7 && !isChatOpen && isVisible) {
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 3000);
+      }
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [isChatOpen, isVisible]);
 
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const springX = useSpring(mouseX, { stiffness: 100, damping: 20 });
+  const springY = useSpring(mouseY, { stiffness: 100, damping: 20 });
+
+  const lookX = useTransform(springX, (x) => Math.max(-10, Math.min(10, (x - (window.innerWidth / 4)) / 40)));
+  const lookY = useTransform(springY, (y) => Math.max(-8, Math.min(8, (y - (window.innerHeight - 100)) / 40)));
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-    };
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [mouseX, mouseY]);
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [chatHistory, isTyping]);
 
-  useEffect(() => {
-    const updateBotPosition = () => {
-      if (botRef.current) {
-        const rect = botRef.current.getBoundingClientRect();
-        setBotCenter({
-          x: rect.left + rect.width / 2,
-          y: rect.top + rect.height / 2
-        });
-      }
-    };
-    if (isVisible) {
-      updateBotPosition();
-      window.addEventListener('scroll', updateBotPosition);
-      window.addEventListener('resize', updateBotPosition);
-    }
-    return () => {
-      window.removeEventListener('scroll', updateBotPosition);
-      window.removeEventListener('resize', updateBotPosition);
-    };
-  }, [isVisible]);
+  const handleGeminiRequest = async (text: string) => {
+    if (!text.trim() || isTyping) return;
+    const userMsg = text.trim();
+    setChatHistory(prev => [...prev, { role: 'user', text: userMsg }]);
+    setChatInput("");
+    setIsTyping(true);
+    setInteractionState('thinking');
 
-  const springX = useSpring(mouseX, { stiffness: 60, damping: 25 });
-  const springY = useSpring(mouseY, { stiffness: 60, damping: 25 });
-
-  const lookX = useTransform(springX, (x) => Math.max(-12, Math.min(12, (x - botCenter.x) / 25)));
-  const lookY = useTransform(springY, (y) => Math.max(-8, Math.min(8, (y - botCenter.y) / 25)));
-
-  useEffect(() => {
-    if (!isVisible) return;
-    const scheduleBlink = () => {
-      blinkTimer.current = setTimeout(() => {
-        if (interactionState === 'normal') {
-          setInteractionState('blink');
-          setTimeout(() => setInteractionState('normal'), 120);
-        }
-        scheduleBlink();
-      }, Math.random() * 5000 + 4000);
-    };
-    scheduleBlink();
-    return () => {
-      if (blinkTimer.current) clearTimeout(blinkTimer.current);
-    };
-  }, [interactionState, isVisible]);
-
-  useEffect(() => {
-    if (!isVisible || isChatOpen) return;
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          const id = entry.target.getAttribute('id');
-          if (id && id !== activeSection) {
-            setActiveSection(id);
-            const msgs = SECTION_MESSAGES[id] || SECTION_MESSAGES.hero;
-            setMessage(msgs[Math.floor(Math.random() * msgs.length)]);
-            setInteractionState('happy');
-            setTimeout(() => setInteractionState('normal'), 1500);
-          }
-        }
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+      const response = await ai.models.generateContent({
+        model: 'gemini-3-flash-preview',
+        contents: userMsg,
+        config: { systemInstruction: SYSTEM_INSTRUCTION }
       });
-    }, { threshold: 0.5 });
-    document.querySelectorAll('section[id]').forEach(s => observer.observe(s));
-    return () => observer.disconnect();
-  }, [activeSection, isVisible, isChatOpen]);
-
-  const toggleVisibility = () => {
-    setIsVisible(!isVisible);
-    setIsMenuOpen(false);
-    setIsThemeMenuOpen(false);
-    if (!isVisible) setInteractionState('happy');
+      setChatHistory(prev => [...prev, { role: 'model', text: response.text || "Oopsie! I got a tiny brain freeze. 🧊 Try again?" }]);
+      setInteractionState('happy');
+    } catch (e) {
+      setChatHistory(prev => [...prev, { role: 'model', text: "Oh no! My signal is wiggly! 📡 Try once more? ✨" }]);
+      setInteractionState('blink');
+    } finally {
+      setIsTyping(false);
+      setTimeout(() => setInteractionState('normal'), 2500);
+    }
   };
 
-  const sendMessageToGemini = async (text: string) => {
-     if (!text.trim()) return;
-     setChatHistory(prev => [...prev, { role: 'user', text }]);
-     setIsTyping(true);
-     setInteractionState('thinking');
-     try {
-       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-       const response = await ai.models.generateContent({
-         model: 'gemini-3-flash-preview',
-         contents: text,
-         config: { systemInstruction: SYSTEM_INSTRUCTION }
-       });
-       setChatHistory(prev => [...prev, { role: 'model', text: response.text || "Oops, I lost my train of thought for a second! 😵‍💫" }]);
-       setInteractionState('happy');
-     } catch (e) {
-       setChatHistory(prev => [...prev, { role: 'model', text: "My circuits are a little fuzzy right now, but I'm still here for you! 🔌" }]);
-       setInteractionState('dizzy');
-     } finally {
-       setIsTyping(false);
-       setTimeout(() => setInteractionState('normal'), 3000);
-     }
+  const wakeUp = () => {
+    setIsVisible(true);
+    setInteractionState('wave');
+    setTimeout(() => setInteractionState('normal'), 2000);
   };
 
-  const themeOptions: { id: Theme; icon: React.ReactNode; label: string }[] = [
-    { id: 'light', icon: <Sun size={14} />, label: 'Light' },
-    { id: 'dark', icon: <Moon size={14} />, label: 'Dark' },
-    { id: 'system', icon: <Laptop size={14} />, label: 'System' }
-  ];
+  const sleep = () => {
+    setInteractionState('love');
+    // Sweet goodbye message
+    const byeMsg = "Bye-bye! I'll be waiting for you right here! 🧸💖";
+    setChatHistory(prev => [...prev, { role: 'model', text: byeMsg }]);
+    
+    setTimeout(() => {
+      setIsVisible(false);
+      setIsChatOpen(false);
+      setIsMenuOpen(false);
+    }, 1200);
+  };
 
   return (
     <>
+      {/* Wake Button */}
       <AnimatePresence>
-        {!isVisible ? (
+        {!isVisible && (
           <motion.button
-            key="awaken-btn"
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            onClick={toggleVisibility}
-            className="fixed bottom-10 left-10 z-[150] flex items-center gap-4 bg-black border border-white/10 shadow-2xl rounded-full pl-2 pr-6 py-2 cursor-pointer group hover:border-brandPrimary/50 transition-all"
+            initial={{ opacity: 0, scale: 0.5, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.5 }}
+            onClick={wakeUp}
+            className="fixed bottom-6 left-6 z-[150] group flex items-center gap-3 bg-white dark:bg-[#0A0A0A] p-2 pr-6 rounded-full shadow-[0_10px_40px_rgba(124,58,237,0.3)] border border-brandPrimary/20"
           >
-             <div className="w-12 h-12 rounded-full bg-brandPrimary flex items-center justify-center text-white shadow-[0_0_25px_rgba(124,58,237,0.5)] group-hover:scale-105 transition-transform">
-               <Bot size={22} />
-             </div>
-             <span className="text-[11px] font-black uppercase tracking-[0.3em] text-white">Meet AG</span>
-          </motion.button>
-        ) : null}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {isVisible ? (
-          <motion.div 
-            key="bot-container"
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 50, opacity: 0 }}
-            className="fixed bottom-10 left-10 z-[200] flex flex-col items-start" 
-            ref={botRef}
-          >
-            <div className="relative flex flex-col items-center">
-              
-              <AnimatePresence mode='wait'>
-                {(!isMenuOpen && !isChatOpen && !isThemeMenuOpen) ? (
-                  <motion.div
-                    key={message}
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 5 }}
-                    className="absolute bottom-[125%] left-0 w-64 bg-white/95 dark:bg-black/95 backdrop-blur-3xl border border-brandPrimary/20 shadow-2xl rounded-[1.5rem] p-4 text-[11px] font-medium leading-relaxed text-black dark:text-white text-center z-10"
-                  >
-                    {message}
-                    <div className="absolute -bottom-2 left-8 w-4 h-4 bg-white dark:bg-black rotate-45 border-r border-b border-brandPrimary/10 dark:border-white/10" />
-                  </motion.div>
-                ) : null}
-              </AnimatePresence>
-
-              <AnimatePresence>
-                {isChatOpen ? (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9, y: 30 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="absolute bottom-[130%] left-0 w-[calc(100vw-3rem)] sm:w-80 md:w-96 h-[500px] bg-white/98 dark:bg-black/98 backdrop-blur-3xl border border-brandPrimary/20 shadow-2xl rounded-[2.5rem] overflow-hidden flex flex-col z-20"
-                  >
-                    <div className="p-5 border-b border-brandPrimary/10 flex justify-between items-center text-black dark:text-white bg-brandPrimary/5 shrink-0">
-                      <div className="flex items-center gap-3">
-                        <Sparkles size={16} className="text-brandPrimary animate-pulse" />
-                        <span className="font-display font-bold text-sm tracking-tight">AG Assistant</span>
-                      </div>
-                      <X size={18} className="cursor-pointer opacity-40 hover:opacity-100 transition-opacity" onClick={() => setIsChatOpen(false)} />
-                    </div>
-
-                    <div className="flex-1 overflow-y-auto p-5 space-y-5 flex flex-col">
-                      {chatHistory.map((m, i) => (
-                        <div key={i} className={`flex w-full ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`p-4 rounded-[1.5rem] max-w-[85%] text-[12px] leading-relaxed shadow-sm ${
-                            m.role === 'user' 
-                              ? 'bg-brandPrimary text-white font-semibold rounded-tr-none' 
-                              : 'bg-brandPrimary/10 text-black dark:text-gray-200 border border-brandPrimary/5 rounded-tl-none'
-                          }`}>
-                            {m.text}
-                          </div>
-                        </div>
-                      ))}
-                      {isTyping ? <div className="flex gap-1"><div className="w-1.5 h-1.5 bg-brandPrimary rounded-full animate-bounce" /><div className="w-1.5 h-1.5 bg-brandPrimary rounded-full animate-bounce delay-75" /><div className="w-1.5 h-1.5 bg-brandPrimary rounded-full animate-bounce delay-150" /></div> : null}
-                    </div>
-
-                    <form onSubmit={(e) => { e.preventDefault(); sendMessageToGemini(chatInput); setChatInput(""); }} className="p-5 border-t border-brandPrimary/10 flex gap-3 bg-brandPrimary/[0.02]">
-                      <input value={chatInput} onChange={e => setChatInput(e.target.value)} className="flex-1 bg-white/50 dark:bg-white/5 rounded-2xl px-5 py-3 text-[12px] text-black dark:text-white outline-none border border-brandPrimary/10 focus:border-brandPrimary transition-all" placeholder="Ask AG anything..." />
-                      <button type="submit" className="p-3 bg-brandPrimary text-white rounded-2xl"><Send size={18} /></button>
-                    </form>
-                  </motion.div>
-                ) : null}
-              </AnimatePresence>
-
-              <div className="relative group cursor-pointer" onClick={() => { if(!isThemeMenuOpen) setIsMenuOpen(!isMenuOpen); else setIsThemeMenuOpen(false); }}>
-                <motion.div 
-                  animate={{ y: [0, -8, 0], scale: [1, 1.02, 1] }}
-                  transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-                  className={`w-24 h-24 rounded-full border-2 relative z-20 flex items-center justify-center transition-all duration-700 ${
-                    isChatOpen || interactionState === 'thinking' 
-                    ? 'bg-brandPrimary border-white/40 shadow-[0_0_60px_rgba(124,58,237,0.8)]' 
-                    : 'bg-white dark:bg-black border-brandPrimary/20 shadow-2xl'
-                  }`}
-                >
-                  <div className={`w-16 h-10 rounded-[1.2rem] flex items-center justify-center gap-3 relative shadow-inner overflow-hidden border transition-colors ${isChatOpen || interactionState === 'thinking' ? 'bg-white/10 border-white/20' : 'bg-brandPrimary/5 border-brandPrimary/10'}`}>
-                    <Eye state={interactionState} lookX={lookX} lookY={lookY} isActive={isChatOpen || interactionState === 'thinking'} />
-                    <Eye state={interactionState} lookX={lookX} lookY={lookY} isActive={isChatOpen || interactionState === 'thinking'} />
-                  </div>
-                </motion.div>
-
-                <AnimatePresence>
-                  {isMenuOpen && !isThemeMenuOpen ? (
-                    <motion.div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-6 flex flex-col items-center gap-5 z-10">
-                      {[
-                        { icon: <MessageCircle size={18} />, label: 'Chat', action: () => setIsChatOpen(true), color: 'bg-brandPrimary' },
-                        { icon: <Copy size={18} />, label: 'Email', action: () => { navigator.clipboard.writeText("hello@agcreators.com"); setMessage("Copied! ✨"); }, color: 'bg-brandPrimary-light' },
-                        { icon: <Heart size={18} />, label: 'Close', action: toggleVisibility, color: 'bg-gray-800' },
-                      ].map((item, i) => (
-                        <motion.button
-                          key={i}
-                          initial={{ opacity: 0, scale: 0, y: 30 }}
-                          animate={{ opacity: 1, scale: 1, y: 0 }}
-                          exit={{ opacity: 0, scale: 0, y: 20 }}
-                          onClick={(e) => { e.stopPropagation(); item.action(); setIsMenuOpen(false); }}
-                          className={`relative w-14 h-14 ${item.color} text-white rounded-full flex items-center justify-center shadow-2xl border border-white/20 hover:scale-110 active:scale-95 transition-all group`}
-                        >
-                          {item.icon}
-                        </motion.button>
-                      ))}
-                    </motion.div>
-                  ) : null}
-                </AnimatePresence>
+            <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-brandPrimary via-purple-400 to-pink-400 flex items-center justify-center text-white shadow-lg relative overflow-hidden">
+               <motion.div 
+                 animate={{ opacity: [0, 0.5, 0] }}
+                 transition={{ repeat: Infinity, duration: 2 }}
+                 className="absolute inset-0 bg-white"
+               />
+               <Bot size={22} className="relative z-10" />
+            </div>
+            <div className="text-left">
+              <div className="text-[10px] font-black uppercase tracking-tighter text-brandPrimary">Hii! I'm AG!</div>
+              <div className="text-[8px] font-mono opacity-50 uppercase tracking-widest flex items-center gap-1">
+                <div className="w-1 h-1 rounded-full bg-green-500 animate-pulse" /> {liveUsers} chatting now
               </div>
             </div>
+          </motion.button>
+        )}
+      </AnimatePresence>
+
+      {/* AG Bot Character UI */}
+      <AnimatePresence>
+        {isVisible && (
+          <motion.div 
+            initial={{ y: 100, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 100, opacity: 0 }}
+            className="fixed bottom-6 left-6 z-[200] flex flex-col items-start"
+            onMouseMove={(e) => { mouseX.set(e.clientX); mouseY.set(e.clientY); }}
+          >
+            {/* Live Notification Toast */}
+            <AnimatePresence>
+              {showNotification && (
+                <motion.div 
+                  initial={{ opacity: 0, x: -20, scale: 0.8 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -20, scale: 0.8 }}
+                  className="absolute bottom-32 left-0 bg-pink-500 text-white px-4 py-2 rounded-2xl text-[10px] font-bold shadow-xl flex items-center gap-2 whitespace-nowrap z-50"
+                >
+                  <Bell size={12} className="animate-bounce" /> Someone just started a project! 🚀
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Chat Window */}
+            <AnimatePresence>
+              {isChatOpen && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, y: 50, transformOrigin: 'bottom left' }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, y: 50 }}
+                  className="absolute bottom-32 left-0 w-[85vw] sm:w-80 md:w-96 h-[520px] bg-white/95 dark:bg-black/95 backdrop-blur-3xl border border-brandPrimary/20 shadow-[0_30px_100px_rgba(124,58,237,0.3)] rounded-[3rem] overflow-hidden flex flex-col"
+                >
+                  {/* Chat Header */}
+                  <div className="p-6 border-b border-brandPrimary/10 flex justify-between items-center bg-gradient-to-r from-brandPrimary/5 to-pink-500/5">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl bg-brandPrimary flex items-center justify-center text-white shadow-lg">
+                        <Heart size={18} fill="currentColor" />
+                      </div>
+                      <div>
+                        <div className="font-display font-bold text-black dark:text-white uppercase tracking-tight text-sm">AG Bestie</div>
+                        <div className="text-[8px] font-mono text-brandPrimary uppercase tracking-widest flex items-center gap-1">
+                          <Activity size={10} /> Live & Happy
+                        </div>
+                      </div>
+                    </div>
+                    <button onClick={() => setIsChatOpen(false)} className="w-8 h-8 rounded-full bg-black/5 dark:bg-white/5 flex items-center justify-center hover:bg-pink-500/10 transition-colors">
+                      <X size={16} />
+                    </button>
+                  </div>
+
+                  {/* Messages Area */}
+                  <div className="flex-1 overflow-y-auto p-6 space-y-4 scrollbar-hide">
+                    {chatHistory.map((m, i) => (
+                      <motion.div 
+                        key={i} 
+                        initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        className={`flex w-full ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div className={`p-4 rounded-3xl max-w-[85%] text-[13px] leading-relaxed shadow-sm ${
+                          m.role === 'user' 
+                            ? 'bg-brandPrimary text-white rounded-tr-none' 
+                            : 'bg-gray-100 dark:bg-white/5 text-black dark:text-white border border-brandPrimary/5 rounded-tl-none'
+                        }`}>
+                          {m.text}
+                        </div>
+                      </motion.div>
+                    ))}
+                    {isTyping && (
+                      <div className="flex gap-1.5 p-3">
+                        <div className="w-2 h-2 bg-brandPrimary rounded-full animate-bounce" />
+                        <div className="w-2 h-2 bg-pink-400 rounded-full animate-bounce [animation-delay:0.2s]" />
+                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-bounce [animation-delay:0.4s]" />
+                      </div>
+                    )}
+                    <div ref={chatEndRef} />
+                  </div>
+
+                  {/* Quick Suggestions */}
+                  {!isTyping && (
+                    <div className="px-6 pb-4 flex flex-wrap gap-2">
+                      {QUICK_PROMPTS.map((p, i) => (
+                        <button
+                          key={i}
+                          onClick={() => handleGeminiRequest(p.text)}
+                          className="px-3 py-1.5 rounded-full bg-brandPrimary/5 border border-brandPrimary/10 text-[9px] font-bold text-brandPrimary hover:bg-brandPrimary hover:text-white transition-all shadow-sm"
+                        >
+                          {p.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Chat Input */}
+                  <form onSubmit={(e) => { e.preventDefault(); handleGeminiRequest(chatInput); }} className="p-6 bg-white dark:bg-[#0A0A0A] border-t border-brandPrimary/10 flex gap-3">
+                    <input 
+                      value={chatInput} 
+                      onChange={e => setChatInput(e.target.value)}
+                      className="flex-1 bg-gray-50 dark:bg-white/5 rounded-2xl px-5 py-3 text-sm outline-none border border-brandPrimary/10 focus:border-brandPrimary transition-all text-black dark:text-white" 
+                      placeholder="Say Hii to AG... ✨" 
+                    />
+                    <button type="submit" className="w-12 h-12 bg-brandPrimary text-white rounded-2xl flex items-center justify-center shadow-lg hover:scale-110 active:scale-95 transition-all">
+                      <Send size={18} />
+                    </button>
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* The Bot Visual Character */}
+            <div 
+              className="relative group flex items-end"
+              onMouseEnter={() => setInteractionState('wave')}
+              onMouseLeave={() => setInteractionState('normal')}
+              onClick={() => { if(!isChatOpen) setIsMenuOpen(!isMenuOpen); }}
+            >
+              {/* Waving Hand (Floating side component) */}
+              <AnimatePresence>
+                {(interactionState === 'wave' || interactionState === 'happy') && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 50, y: 10, rotate: -20 }}
+                    animate={{ opacity: 1, x: 70, y: -10, rotate: [0, 30, -30, 30, 0] }}
+                    exit={{ opacity: 0, scale: 0 }}
+                    transition={{ rotate: { repeat: Infinity, duration: 0.8 } }}
+                    className="absolute z-30 pointer-events-none"
+                  >
+                    <div className="w-12 h-12 bg-white dark:bg-gray-900 rounded-full flex items-center justify-center shadow-xl border-2 border-brandPrimary/30">
+                      <span className="text-2xl">👋</span>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Bot Main Body */}
+              <motion.div 
+                whileHover={{ y: -8, scale: 1.05 }}
+                animate={{ 
+                  y: [0, -10, 0],
+                  boxShadow: interactionState === 'thinking' ? '0 0 50px rgba(124,58,237,0.5)' : '0 15px 45px rgba(0,0,0,0.1)'
+                }}
+                transition={{ y: { repeat: Infinity, duration: 3.5, ease: "easeInOut" } }}
+                className={`w-24 h-24 md:w-28 md:h-28 rounded-full border-4 flex items-center justify-center transition-all duration-700 relative z-20 cursor-pointer overflow-hidden ${
+                  isChatOpen ? 'bg-brandPrimary border-white/60 shadow-2xl' : 'bg-white dark:bg-[#0A0A0A] border-brandPrimary/40'
+                }`}
+              >
+                {/* Internal Glow for Emotions */}
+                <motion.div 
+                  animate={{ 
+                    opacity: (interactionState === 'thinking' || interactionState === 'happy' || interactionState === 'love') ? 0.4 : 0,
+                    scale: [1, 1.2, 1]
+                  }}
+                  className={`absolute inset-0 bg-gradient-to-tr ${interactionState === 'thinking' ? 'from-purple-500 to-blue-500' : 'from-pink-400 to-yellow-300'} blur-xl`}
+                />
+
+                {/* Face Frame */}
+                <div className={`w-18 h-12 md:w-20 md:h-14 rounded-[2rem] flex items-center justify-center gap-3 relative z-10 transition-all ${isChatOpen ? 'bg-white/20' : 'bg-brandPrimary/10'}`}>
+                   {/* Blush Effects */}
+                   <AnimatePresence>
+                     {(interactionState === 'happy' || interactionState === 'love' || interactionState === 'wave') && (
+                       <motion.div 
+                         initial={{ opacity: 0 }}
+                         animate={{ opacity: 0.6 }}
+                         exit={{ opacity: 0 }}
+                         className="absolute inset-0 flex justify-between items-center px-2 pt-4"
+                       >
+                         <div className="w-4 h-2 bg-pink-400/50 blur-[4px] rounded-full" />
+                         <div className="w-4 h-2 bg-pink-400/50 blur-[4px] rounded-full" />
+                       </motion.div>
+                     )}
+                   </AnimatePresence>
+                   
+                   <BotEye state={interactionState} lookX={lookX} lookY={lookY} isActive={isChatOpen} />
+                   <BotEye state={interactionState} lookX={lookX} lookY={lookY} isActive={isChatOpen} />
+                </div>
+              </motion.div>
+
+              {/* Menu Controls (Satellites) */}
+              <AnimatePresence>
+                {isMenuOpen && !isChatOpen && (
+                  <motion.div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-8 flex flex-col items-center gap-4 z-10">
+                    {[
+                      { icon: <MessageSquare size={18} />, label: 'Chat', action: () => setIsChatOpen(true), color: 'bg-brandPrimary' },
+                      { icon: <Zap size={18} />, label: 'Theme', action: () => onSetTheme(currentTheme === 'dark' ? 'light' : 'dark'), color: 'bg-pink-500' },
+                      { icon: <X size={18} />, label: 'Bye!', action: sleep, color: 'bg-gray-800' },
+                    ].map((item, i) => (
+                      <motion.button
+                        key={i}
+                        initial={{ opacity: 0, scale: 0, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0, y: 10 }}
+                        transition={{ delay: i * 0.1, type: 'spring', damping: 15 }}
+                        onClick={(e) => { e.stopPropagation(); item.action(); setIsMenuOpen(false); }}
+                        className={`w-14 h-14 ${item.color} text-white rounded-full flex items-center justify-center shadow-2xl border-2 border-white/20 hover:scale-125 active:scale-90 transition-all group`}
+                      >
+                        {item.icon}
+                        <span className="absolute left-full ml-6 px-3 py-1.5 bg-black/90 text-white text-[10px] font-bold rounded-xl opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap backdrop-blur-md">
+                          {item.label}
+                        </span>
+                      </motion.button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </motion.div>
-        ) : null}
+        )}
       </AnimatePresence>
     </>
   );
 };
 
-const Eye: React.FC<{ state: string, lookX: any, lookY: any, isActive: boolean }> = ({ state, lookX, lookY, isActive }) => {
-  if (state === 'blink') return <div className={`w-3.5 h-0.5 rounded-full opacity-60 self-center ${isActive ? 'bg-white' : 'bg-brandPrimary'}`} />;
+const BotEye: React.FC<{ state: string, lookX: any, lookY: any, isActive: boolean }> = ({ state, lookX, lookY, isActive }) => {
+  if (state === 'love') return <Heart size={18} fill="currentColor" className={isActive ? 'text-white animate-pulse' : 'text-pink-500 animate-pulse'} />;
+  if (state === 'blink') return <div className={`w-5 h-1 rounded-full ${isActive ? 'bg-white' : 'bg-brandPrimary'}`} />;
+  if (state === 'thinking') return (
+    <motion.div 
+      animate={{ rotate: 360 }}
+      transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+      className={`w-4 h-4 border-2 border-t-transparent rounded-full ${isActive ? 'border-white' : 'border-brandPrimary'}`} 
+    />
+  );
+  
   return (
-    <div className={`w-3.5 h-3.5 rounded-full relative overflow-hidden ring-1 ${isActive ? 'bg-white/10 ring-white/20' : 'bg-brandPrimary/5 ring-brandPrimary/10'}`}>
-      <motion.div style={{ x: lookX, y: lookY }} className={`w-2 h-2 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${isActive ? 'bg-white' : 'bg-brandPrimary'}`} />
+    <div className={`w-5 h-5 rounded-full relative overflow-hidden flex items-center justify-center ${isActive ? 'bg-white/10' : 'bg-brandPrimary/5'}`}>
+      <motion.div 
+        style={{ x: lookX, y: lookY }}
+        className={`w-2.5 h-2.5 rounded-full ${isActive ? 'bg-white' : 'bg-brandPrimary'}`}
+      />
     </div>
   );
 };
